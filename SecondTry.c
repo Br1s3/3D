@@ -43,9 +43,6 @@ int main()
 
 	    EndMode3D();
 	}
-
-	
-
 	
 	DrawFPS(20, 20);
 	EndDrawing();

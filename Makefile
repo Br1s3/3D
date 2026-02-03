@@ -3,7 +3,8 @@ RM = rm -rfv
 
 CFLAGS +=	\
 -Wall		\
--Wextra
+-Wextra 	\
+-g3
 
 RAYFLAGS +=	\
 -lraylib	\
@@ -17,7 +18,7 @@ RAYFLAGS +=	\
 
 .PHONY: all
 
-all: FirstTry SecondTry
+all: FirstTry SecondTry ThirdTry
 
 %: %.c
 	$(CC) $< -o $@ $(CFLAGS) $(RAYFLAGS)

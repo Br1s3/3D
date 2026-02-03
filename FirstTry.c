@@ -1,8 +1,8 @@
 #include <raylib.h>
 
+#define FPS 200
 #define WIDTH 1200
 #define HEIGHT 800
-#define FPS 200
 #define SQUARESIZE 100
 
 
@@ -12,7 +12,7 @@ int main()
     Vector2 Zero = {WIDTH/2, HEIGHT/2};
     
     InitWindow(WIDTH, HEIGHT, "3D rendering");
-    SetTargetFPS(200);
+    SetTargetFPS(FPS);
     
     while (!WindowShouldClose()) {
 	Vector2 PosMouse = {GetTouchX(), GetTouchY()};
