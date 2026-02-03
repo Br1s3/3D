@@ -58,15 +58,15 @@ int main()
     Square S;
     Square_Connexion Sc;
     
-    S.p[0] = (COORD3DF){0.25, 0.25, 0.25};
-    S.p[1] = (COORD3DF){-0.25, 0.25, 0.25};
-    S.p[2] = (COORD3DF){0.25, -0.25, 0.25};
-    S.p[3] = (COORD3DF){-0.25, -0.25, 0.25};
+    S.p[0] = (COORD3DF){0.5, 0.5, 0.5};
+    S.p[1] = (COORD3DF){-0.5, 0.5, 0.5};
+    S.p[2] = (COORD3DF){0.5, -0.5, 0.5};
+    S.p[3] = (COORD3DF){-0.5, -0.5, 0.5};
 
-    S.p[4] = (COORD3DF){0.25, 0.25, -0.25};
-    S.p[5] = (COORD3DF){-0.25, 0.25, -0.25};
-    S.p[6] = (COORD3DF){0.25, -0.25, -0.25};
-    S.p[7] = (COORD3DF){-0.25, -0.25, -0.25};
+    S.p[4] = (COORD3DF){0.5, 0.5, -0.5};
+    S.p[5] = (COORD3DF){-0.5, 0.5, -0.5};
+    S.p[6] = (COORD3DF){0.5, -0.5, -0.5};
+    S.p[7] = (COORD3DF){-0.5, -0.5, -0.5};
 
     Sc.p[0][0] = 0;
     Sc.p[0][1] = 1;
@@ -84,47 +84,35 @@ int main()
     const double dt = 1.f/FPS;    
 
     double dz = 1;
+    double angle = 0;
     for (double t = 0; t < 10; t+=dt) {
-	dz+=dt;
+	dz += 1*dt;
+	angle += 2*M_PI*dt;
 	cons_clear(console, WIDTH, HEIGHT, '.');
-
-	// for (int i = 0; i < 2; i++) {
-	//     for (int j = 0; j < 4; j++) {
-	// 	buf[0] = convert(S.p[Sc.p[i][j]]);
-	// 	buf[1] = convert(S.p[Sc.p[i][j+1]]);
-	// 	cons_rect(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, buf[0].y*(HEIGHT/2)-1, 2, 2, '@');		
-	//     }
-	// }
 	
 	for (int i = 0; i < 2; i++) {
 	    int j = 0;
 	    COORD3DF buf[2];
+	    // Z_translation(&S.p[i*4], 4, dz);
+	    XZ_rotation(&S.p[i*4], 4, dt);
 	    for (; j < 3; j++) {
-		
-		// XZ_rotation(&S.p[Sc.p[i][j+1]], 1, dz);
 		buf[0] = convert(S.p[Sc.p[i][j]]);
 		buf[1] = convert(S.p[Sc.p[i][j+1]]);
-		// Z_translation(buf, 2, dz);
-
-		// if (S.p[Sc.p[i][j]].z > 0)
-		// cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
+		
 		cons_rect(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, buf[0].y*(HEIGHT/2)-1, 2, 2, '@');
-	    }
-	    // XZ_rotation(&S.p[Sc.p[i][j]], 1, dz);
-	    // XZ_rotation(&S.p[Sc.p[i][0]], 1, dz);
+		cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
+	    }	    
 	    buf[0] = convert(S.p[Sc.p[i][j]]);
-	    // buf[1] = convert(S.p[Sc.p[i][0]]);
-	    // Z_translation(buf, 2, dz);
+	    buf[1] = convert(S.p[Sc.p[i][0]]);
 	    
-	    // if (S.p[Sc.p[i][j]].z > 0)
-	        cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
+	    cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
 	    cons_rect(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, buf[0].y*(HEIGHT/2)-1, 2, 2, '@');
 	    // printf("{%lf, %lf, %lf}:%lf\n", S.p[i].x, S.p[i].y, S.p[i].z, dz);
-	    printf("%d:{%lf, %lf, %lf}:%lf\n", i*4+j, buf[0].x, buf[0].y, S.p[i*4+j].z, dz);
+	    printf("%d:{%lf, %lf, %lf}:%lf\n", Sc.p[i][j], buf[0].x, buf[0].y, S.p[Sc.p[i][j]].z, dz);
 	}
 	
-	Z_translation(S.p, 8, dt);
-	XZ_rotation(S.p, 8, dt);
+	// XZ_rotation(S.p, 8, angle);
+	// Z_translation(S.p, 8, dt);
 
 	usleep(100000);
 
