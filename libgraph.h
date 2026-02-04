@@ -150,8 +150,10 @@ void cons_ligne(char **pixels, short width, short height, int ax, int ay, int bx
     for (double t = 0; t < 1; t+=0.01) {
 	double x = (AB.x*t + a.x);
 	double y = (AB.y*t + a.y);
-	if (ABS(x*(width/2)) > width/2 || ABS(y*(height/2)) > height/2) break;
-	pixels[(int)(-y*(height/2)) + height/2][(int)(x*width/2) + width/2] = fd;
+	if (ABS(x*(width/2)) > width/2-1 || ABS(y*(height/2)) > height/2-1) break;
+	// printf("{%d, %d; %d, %d}:{%d, %d}\n", ax, ay, bx, by, (int)((height/2)*(1 - y)), (int)((width/2)*(1 + x)));
+	// pixels[(int)(-y*(height/2)) + height/2][(int)(x*width/2) + width/2] = fd;
+	pixels[(int)((height/2)*(1 - y))][(int)((width/2)*(1 + x))] = fd;
     }
 }
 

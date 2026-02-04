@@ -20,7 +20,7 @@ RAYFLAGS +=	\
 
 all: FirstTry SecondTry ThirdTry
 
-%: %.c
+%: %.c libgraph.h
 	$(CC) $< -o $@ $(CFLAGS) $(RAYFLAGS)
 
 .PHONY: clean

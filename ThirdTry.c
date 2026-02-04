@@ -25,7 +25,7 @@ typedef struct
 
 typedef struct
 {
-    int p[2][4];
+    int p[4][4];
 } Square_Connexion;
 
 
@@ -34,22 +34,18 @@ COORD3DF convert(COORD3DF p)
     return (COORD3DF){p.x/p.z, p.y/p.z, p.z};
 }
 
-void Z_translation(COORD3DF *p, int len, double trans)
+void Z_translation(COORD3DF *p, double trans)
 {
-    for (int i = 0; i < len; i++) {
-	p[i].z += trans;
-    }
+    p->z += trans;
 }
 
-void XZ_rotation(COORD3DF *p, int len, double theta)
+void XZ_rotation(COORD3DF *p, double theta)
 {
-    for (int i = 0; i < len; i++) {
-	double c = cos(theta);
-	double s = sin(theta);
-	p[i].x = p[i].x*c - p[i].z*s;
-	p[i].z = p[i].x*s + p[i].z*c;
-	// p[i].y = p[i].x*s + p[i].y*c;
-    }
+    double c = cos(theta);
+    double s = sin(theta);
+    p->x = p->x*c - p->z*s;
+    p->z = p->x*s + p->z*c;
+    // p[i].y = p[i].x*s + p[i].y*c;
 }
 
 
@@ -58,15 +54,15 @@ int main()
     Square S;
     Square_Connexion Sc;
     
-    S.p[0] = (COORD3DF){0.5, 0.5, 0.5};
-    S.p[1] = (COORD3DF){-0.5, 0.5, 0.5};
-    S.p[2] = (COORD3DF){0.5, -0.5, 0.5};
-    S.p[3] = (COORD3DF){-0.5, -0.5, 0.5};
+    S.p[0] = (COORD3DF){0.25, 0.25, 0.25};
+    S.p[1] = (COORD3DF){-0.25, 0.25, 0.25};
+    S.p[2] = (COORD3DF){0.25, -0.25, 0.25};
+    S.p[3] = (COORD3DF){-0.25, -0.25, 0.25};
 
-    S.p[4] = (COORD3DF){0.5, 0.5, -0.5};
-    S.p[5] = (COORD3DF){-0.5, 0.5, -0.5};
-    S.p[6] = (COORD3DF){0.5, -0.5, -0.5};
-    S.p[7] = (COORD3DF){-0.5, -0.5, -0.5};
+    S.p[4] = (COORD3DF){0.25, 0.25, -0.25};
+    S.p[5] = (COORD3DF){-0.25, 0.25, -0.25};
+    S.p[6] = (COORD3DF){0.25, -0.25, -0.25};
+    S.p[7] = (COORD3DF){-0.25, -0.25, -0.25};
 
     Sc.p[0][0] = 0;
     Sc.p[0][1] = 1;
@@ -77,6 +73,16 @@ int main()
     Sc.p[1][1] = 5;
     Sc.p[1][2] = 7;
     Sc.p[1][3] = 6;
+
+    Sc.p[2][0] = 0;
+    Sc.p[2][1] = 4;
+    Sc.p[2][2] = 1;
+    Sc.p[2][3] = 5;
+
+    Sc.p[3][0] = 3;
+    Sc.p[3][1] = 7;
+    Sc.p[3][2] = 2;
+    Sc.p[3][3] = 6;
 
     
     char **console = mem_alloc(HEIGHT, WIDTH);
@@ -89,34 +95,33 @@ int main()
 	dz += 1*dt;
 	angle += 2*M_PI*dt;
 	cons_clear(console, WIDTH, HEIGHT, '.');
-	
-	for (int i = 0; i < 2; i++) {
-	    int j = 0;
-	    COORD3DF buf[2];
-	    // Z_translation(&S.p[i*4], 4, dz);
-	    XZ_rotation(&S.p[i*4], 4, dt);
-	    for (; j < 3; j++) {
-		buf[0] = convert(S.p[Sc.p[i][j]]);
-		buf[1] = convert(S.p[Sc.p[i][j+1]]);
-		
-		cons_rect(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, buf[0].y*(HEIGHT/2)-1, 2, 2, '@');
-		cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
-	    }	    
-	    buf[0] = convert(S.p[Sc.p[i][j]]);
-	    buf[1] = convert(S.p[Sc.p[i][0]]);
-	    
-	    cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, -buf[0].y*(HEIGHT/2)-1, buf[1].x*(WIDTH/2)-1, -buf[1].y*(HEIGHT/2)-1, '#');
-	    cons_rect(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2)-1, buf[0].y*(HEIGHT/2)-1, 2, 2, '@');
-	    // printf("{%lf, %lf, %lf}:%lf\n", S.p[i].x, S.p[i].y, S.p[i].z, dz);
-	    printf("%d:{%lf, %lf, %lf}:%lf\n", Sc.p[i][j], buf[0].x, buf[0].y, S.p[Sc.p[i][j]].z, dz);
-	}
-	
-	// XZ_rotation(S.p, 8, angle);
-	// Z_translation(S.p, 8, dt);
 
-	usleep(100000);
+	for (int i = 0; i < 8; i++) {
+	    COORD3DF buf = S.p[i];
+	    XZ_rotation(&buf, angle);
+	    Z_translation(&buf, dz);
+	    buf = convert(buf);
+	    cons_rect(console, WIDTH, HEIGHT, buf.x*(WIDTH/2-1), buf.y*(HEIGHT/2-1), 2, 2, '@');
+	}
+
+	for (int i = 0; i < 4; i++) {
+	    for (int j = 0; j < 4; j++) {
+		// printf("{%d, %d}: %lf\n", Sc.p[i][j], Sc.p[i][(j+1)%4], S.p[Sc.p[i][j]].x);
+		COORD3DF buf[2] = {S.p[Sc.p[i][j]], S.p[Sc.p[i][(j+1)%4]]};
+		XZ_rotation(&buf[0], angle);
+		XZ_rotation(&buf[1], angle);
+		Z_translation(&buf[0], dz);
+		Z_translation(&buf[1], dz);
+		buf[0] = convert(buf[0]);
+		buf[1] = convert(buf[1]);
+		cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2-1), -buf[0].y*(HEIGHT/2-1), buf[1].x*(WIDTH/2-1), -buf[1].y*(HEIGHT/2-1), '+');
+	    }
+	    // printf("\n");
+	}
 
 	print_cons(console, WIDTH, HEIGHT);
+
+	usleep(100000);
     }
     mem_free(console, HEIGHT);
     /*
