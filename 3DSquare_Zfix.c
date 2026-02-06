@@ -6,6 +6,9 @@
 #include "libgraph.h"
 
 #define FPS 60
+#define WIDTH 600
+#define HEIGHT 600
+#define SIZESQUARE 10
 
 
 typedef struct
@@ -94,83 +97,13 @@ void Square_Connexion_init(Square_Connexion *Sc)
     Sc->p[5][3] = 7;
 }
 
-// #define X1
-#ifdef X1
-#define WIDTH 120
-#define HEIGHT 50
-#define SIZESQUARE 2
-
-int main()
-{
-    Square S;
-    Square_Connexion Sc;
-
-    int shape[] = {4,4,2,2,2,2};
-
-    Square_init(&S);
-    Square_Connexion_init(&Sc);
-    
-    char **console = mem_alloc(HEIGHT, WIDTH);
-
-    const double dt = 1.f/FPS;    
-    double dz    = 1;
-    double angle = 0;
-
-    // for (double t = 0; t < 10; t+=dt) {
-    while (1) {
-	// dz    += 1*dt;
-	angle += 1*M_PI*dt;
-	cons_clear(console, WIDTH, HEIGHT, '.');
-
-	for (int i = 0; i < 8; i++) {
-	    COORD3DF buf = S.p[i];
-	    XZ_rotation(&buf, angle);
-	    Z_translation(&buf, dz);
-
-	    cons_rect(console, WIDTH, HEIGHT, convert(buf).x*(WIDTH/2) - SIZESQUARE/2, convert(buf).y*(HEIGHT/2) - SIZESQUARE/2, SIZESQUARE, SIZESQUARE, '@');
-	}
-
-	for (int i = 0; i < 6; i++) {
-	    for (int j = 0; j < shape[i]; j++) {
-		COORD3DF buf[2] = {S.p[Sc.p[i][j]], S.p[Sc.p[i][(j+1)%4]]};
-		XZ_rotation(&buf[0], angle);
-		XZ_rotation(&buf[1], angle);
-		Z_translation(&buf[0], dz);
-		Z_translation(&buf[1], dz);
-		buf[0] = convert(buf[0]);
-		buf[1] = convert(buf[1]);
-		cons_ligne(console, WIDTH, HEIGHT, buf[0].x*(WIDTH/2), -buf[0].y*(HEIGHT/2), buf[1].x*(WIDTH/2), -buf[1].y*(HEIGHT/2), '+');
-	    }
-	}
-
-	print_cons(console, WIDTH, HEIGHT);
-
-	usleep(dt*1000000);
-    }
-    mem_free(console, HEIGHT);
-    return 0;    
-}
-
-#else
-#define WIDTH 1200
-#define HEIGHT 600
-#define SIZESQUARE 10
-
-COORD3DF zero()
-{
-    COORD3DF ret = {
-	.x = WIDTH/2,
-	.y = HEIGHT/2
-    };
-    return ret;
-}
 
 int main()
 {
     Square S;
     Square_Connexion Sc;
     int shape[] = {4,4,2,2,2,2};
-    
+    Vector2 Zero = {WIDTH/2, HEIGHT/2};    
     Square_init(&S);
     Square_Connexion_init(&Sc);
     
@@ -181,18 +114,17 @@ int main()
     double dz    = 1;
     double angle = 0;
     while (!WindowShouldClose()) {
-	// dz    += 1*dt;
+	dz    += 1*dt;
 	angle += 1*M_PI*dt;	
 	BeginDrawing();
 	ClearBackground(BLACK);
 		
-	// for (int i = 0; i < 8; i++) {
-	//     COORD3DF buf = S.p[i];
-	//     XZ_rotation(&buf, angle);
-	//     Z_translation(&buf, dz);
-
-	//     DrawRectangle(zero().x + convert(buf).x*(WIDTH/2) - SIZESQUARE/2, zero().y + convert(buf).y*(-HEIGHT/2) - SIZESQUARE/2, SIZESQUARE, SIZESQUARE, RED);
-	// }
+	for (int i = 0; i < 8; i++) {
+	    COORD3DF buf = S.p[i];
+	    XZ_rotation(&buf, angle);
+	    Z_translation(&buf, dz);
+ 	    DrawRectangle(Zero.x + convert(buf).x*(WIDTH/2) - SIZESQUARE/2, Zero.y + convert(buf).y*(-HEIGHT/2) - SIZESQUARE/2, SIZESQUARE, SIZESQUARE, RED);
+	}
 
 	for (int i = 0; i < 6; i++) {
 	    for (int j = 0; j < shape[i]; j++) {
@@ -205,7 +137,7 @@ int main()
 		buf[0] = convert(buf[0]);
 		buf[1] = convert(buf[1]);
 		
-		DrawLine(zero().x + buf[0].x*(WIDTH/2), zero().y + -buf[0].y*(HEIGHT/2), zero().x + buf[1].x*(WIDTH/2), zero().y + -buf[1].y*(HEIGHT/2), GREEN);
+		DrawLine(Zero.x + buf[0].x*(WIDTH/2), Zero.y + -buf[0].y*(HEIGHT/2), Zero.x + buf[1].x*(WIDTH/2), Zero.y + -buf[1].y*(HEIGHT/2), GREEN);
 	    }
 	}
 	
@@ -216,4 +148,3 @@ int main()
     
     return 0;
 }
-#endif

@@ -1,5 +1,9 @@
 CC = gcc
 RM = rm -rfv
+EXEC +=		\
+3DSquare_Zfix	\
+3DSquare 	\
+SecondTry
 
 CFLAGS +=	\
 -Wall		\
@@ -18,7 +22,7 @@ RAYFLAGS +=	\
 
 .PHONY: all
 
-all: FirstTry SecondTry ThirdTry
+all: $(EXEC)
 
 %: %.c libgraph.h
 	$(CC) $< -o $@ $(CFLAGS) $(RAYFLAGS)
@@ -26,4 +30,4 @@ all: FirstTry SecondTry ThirdTry
 .PHONY: clean
 
 clean:
-	$(RM) main
+	$(RM) $(EXEC)
