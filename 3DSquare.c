@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include <math.h>
 
-#define FPS 200
+#define FPS 60
 #define WIDTH 1200
 #define HEIGHT 800
 #define SQUARESIZE 100
@@ -25,15 +25,15 @@ typedef struct
 
 void Square_init(Square *S)
 {
-    S->p[0] = (COORD3DF){ 1,  1,  1};
-    S->p[1] = (COORD3DF){-1,  1,  1};
-    S->p[2] = (COORD3DF){-1, -1,  1};
-    S->p[3] = (COORD3DF){ 1, -1,  1};
+    S->p[0] = (COORD3DF){ 0.5,  0.5,  0.5};
+    S->p[1] = (COORD3DF){-0.5,  0.5,  0.5};
+    S->p[2] = (COORD3DF){-0.5, -0.5,  0.5};
+    S->p[3] = (COORD3DF){ 0.5, -0.5,  0.5};
 
-    S->p[4] = (COORD3DF){ 1,  1, -1};
-    S->p[5] = (COORD3DF){-1,  1, -1};
-    S->p[6] = (COORD3DF){-1, -1, -1};
-    S->p[7] = (COORD3DF){ 1, -1, -1};
+    S->p[4] = (COORD3DF){ 0.5,  0.5, -0.5};
+    S->p[5] = (COORD3DF){-0.5,  0.5, -0.5};
+    S->p[6] = (COORD3DF){-0.5, -0.5, -0.5};
+    S->p[7] = (COORD3DF){ 0.5, -0.5, -0.5};
 }
 
 void Square_Connexion_init(Square_Connexion *Sc)
@@ -69,9 +69,14 @@ void Square_Connexion_init(Square_Connexion *Sc)
     Sc->p[5][3] = 7;
 }
 
-double convert(double p, int size)
+// double convert(double p, int size)
+// {
+//     return p += size;
+// }
+
+COORD3DF convert(COORD3DF p)
 {
-    return p += size;
+    return (COORD3DF){p.x/p.z, p.y/p.z, p.z};
 }
 
 void Z_translation(COORD3DF *p, double trans)
@@ -105,7 +110,7 @@ int main()
     SetTargetFPS(FPS);
 
     const double dt = 1.f/FPS;
-    double t = 0;
+    double dz = 1;
     double angle = 0;
     while (!WindowShouldClose()) {
 	Vector2 PosMouse = {GetTouchX(), GetTouchY()};
@@ -113,6 +118,8 @@ int main()
 	    EscapePoint.x = PosMouse.x - WIDTH/2;
 	    EscapePoint.y = PosMouse.y - HEIGHT/2;
 	}
+	// dz    += 1.f*dt;
+	angle += 1.f*M_PI*dt;
 	BeginDrawing();
 	ClearBackground(BLACK);
 
@@ -126,23 +133,23 @@ int main()
 	Square buf;
 	int shape[] = {4,4,2,2,2,2};
 
-	t += dt;
-	angle += M_PI*dt;
 	for (int i = 0; i < 8; i++) {
 	    buf.p[i].x = S.p[i].x; buf.p[i].y = S.p[i].y; buf.p[i].z = S.p[i].z;
 	    XZ_rotation(&buf.p[i], angle);
-	    Z_translation(&buf.p[i], t);
-	}
-
-	
-	for (int i = 0; i < 8; i++) {
-	    DrawCircle(Zero.x + convert(buf.p[i].x*SQUARESIZE, buf.p[i].z*SQUARESIZE*ratio.x), Zero.y + convert(buf.p[i].y*SQUARESIZE, buf.p[i].z*SQUARESIZE*ratio.y), 10, RED);
+	    Z_translation(&buf.p[i], dz);
+	    DrawCircle(Zero.x + convert(buf.p[i]).x*SQUARESIZE+buf.p[i].z*SQUARESIZE*ratio.x, Zero.y + convert(buf.p[i]).y*SQUARESIZE+buf.p[i].z*SQUARESIZE*ratio.y, 10, RED); //bon
 	}
 
 	for (int i = 0; i < 6; i++) {
 	    for (int j = 0; j < shape[i]; j++) {
-		COORD3DF temp[2] = {buf.p[Sc.p[i][j]], buf.p[Sc.p[i][(j+1)%4]]};
-		DrawLine(Zero.x + convert(temp[0].x*SQUARESIZE, temp[0].z*SQUARESIZE*ratio.x), Zero.y + convert(temp[0].y*SQUARESIZE, temp[0].z*SQUARESIZE*ratio.y), Zero.x + convert(temp[1].x*SQUARESIZE, temp[1].z*SQUARESIZE*ratio.x), Zero.y + convert(temp[1].y*SQUARESIZE, temp[1].z*SQUARESIZE*ratio.y), GREEN);
+		COORD3DF temp[2] = {S.p[Sc.p[i][j]], S.p[Sc.p[i][(j+1)%4]]};
+
+		XZ_rotation(&temp[0], angle);
+		XZ_rotation(&temp[1], angle);
+		Z_translation(&temp[0], dz);
+		Z_translation(&temp[1], dz);
+		
+		DrawLine(Zero.x + convert(temp[0]).x*SQUARESIZE+temp[0].z*SQUARESIZE*ratio.x, Zero.y + convert(temp[0]).y*SQUARESIZE+temp[0].z*SQUARESIZE*ratio.y, Zero.x + convert(temp[1]).x*SQUARESIZE+temp[1].z*SQUARESIZE*ratio.x, Zero.y + convert(temp[1]).y*SQUARESIZE+temp[1].z*SQUARESIZE*ratio.y, GREEN); // bon
 	    }
 	}
 	

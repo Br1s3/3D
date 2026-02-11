@@ -53,15 +53,15 @@ void XZ_rotation(COORD3DF *p, double theta)
 
 void Square_init(Square *S)
 {
-    S->p[0] = (COORD3DF){ 0.25,  0.25,  0.25};
-    S->p[1] = (COORD3DF){-0.25,  0.25,  0.25};
-    S->p[2] = (COORD3DF){-0.25, -0.25,  0.25};
-    S->p[3] = (COORD3DF){ 0.25, -0.25,  0.25};
+    S->p[0] = (COORD3DF){ 0.5,  0.5,  0.5};
+    S->p[1] = (COORD3DF){-0.5,  0.5,  0.5};
+    S->p[2] = (COORD3DF){-0.5, -0.5,  0.5};
+    S->p[3] = (COORD3DF){ 0.5, -0.5,  0.5};
 
-    S->p[4] = (COORD3DF){ 0.25,  0.25, -0.25};
-    S->p[5] = (COORD3DF){-0.25,  0.25, -0.25};
-    S->p[6] = (COORD3DF){-0.25, -0.25, -0.25};
-    S->p[7] = (COORD3DF){ 0.25, -0.25, -0.25};
+    S->p[4] = (COORD3DF){ 0.5,  0.5, -0.5};
+    S->p[5] = (COORD3DF){-0.5,  0.5, -0.5};
+    S->p[6] = (COORD3DF){-0.5, -0.5, -0.5};
+    S->p[7] = (COORD3DF){ 0.5, -0.5, -0.5};
 }
 
 void Square_Connexion_init(Square_Connexion *Sc)
@@ -111,11 +111,11 @@ int main()
     SetTargetFPS(FPS);
 
     const double dt = 1.f/FPS;
-    double dz    = 1;
+    double dz    = 1.3;
     double angle = 0;
     while (!WindowShouldClose()) {
-	dz    += 1*dt;
-	angle += 1*M_PI*dt;	
+	// dz    += 1.f*dt;
+	angle += 1.f*M_PI*dt;
 	BeginDrawing();
 	ClearBackground(BLACK);
 		
@@ -128,16 +128,13 @@ int main()
 
 	for (int i = 0; i < 6; i++) {
 	    for (int j = 0; j < shape[i]; j++) {
-		COORD3DF buf[2] = {S.p[Sc.p[i][j]], S.p[Sc.p[i][(j+1)%4]]};
-		XZ_rotation(&buf[0], angle);
-		XZ_rotation(&buf[1], angle);
-		Z_translation(&buf[0], dz);
-		Z_translation(&buf[1], dz);
+		COORD3DF temp[2] = {S.p[Sc.p[i][j]], S.p[Sc.p[i][(j+1)%4]]};
+		XZ_rotation(&temp[0], angle);
+		XZ_rotation(&temp[1], angle);
+		Z_translation(&temp[0], dz);
+		Z_translation(&temp[1], dz);
 
-		buf[0] = convert(buf[0]);
-		buf[1] = convert(buf[1]);
-		
-		DrawLine(Zero.x + buf[0].x*(WIDTH/2), Zero.y + -buf[0].y*(HEIGHT/2), Zero.x + buf[1].x*(WIDTH/2), Zero.y + -buf[1].y*(HEIGHT/2), GREEN);
+		DrawLine(Zero.x + convert(temp[0]).x*(WIDTH/2), Zero.y + -convert(temp[0]).y*(HEIGHT/2), Zero.x + convert(temp[1]).x*(WIDTH/2), Zero.y + -convert(temp[1]).y*(HEIGHT/2), GREEN);
 	    }
 	}
 	
